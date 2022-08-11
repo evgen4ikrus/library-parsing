@@ -39,8 +39,12 @@ def parse_book_page(url, book_id):
     book_title = title_tag.text.split('::')[0].strip()
     book_author = title_tag.text.split('::')[1].strip()
     full_book_title = f'{book_id}. {book_title}'
-
-    return full_book_title, book_cover_link
+    comments_tag = soup.find_all('div', class_='texts')
+    book_comments = []
+    for book_comment in comments_tag:
+        book_comments.append(book_comment.find('span').text)
+        
+    return full_book_title, book_cover_link, book_comments
 
 
 def main():
@@ -61,7 +65,7 @@ def main():
             continue
 
         book_link = f'https://tululu.org/b{number}/'
-        book_title, book_cover_link = parse_book_page(book_link, number)
+        book_title, book_cover_link, book_comments = parse_book_page(book_link, number)
         
         download_txt(book_download_link, book_title, folder=book_folder)
         download_image(book_cover_link, number)
