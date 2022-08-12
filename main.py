@@ -15,10 +15,10 @@ def download_txt(url, filename, folder='books/'):
         file.write(response.content)
 
 
-def download_image(url, number, folder='images/'):
+def download_image(url, book_id, folder='images/'):
     response = requests.get(url)
     response.raise_for_status()
-    image_name = f'image_{number}'
+    image_name = f'image_{book_id}'
     filepath = os.path.join(f'{folder}{sanitize_filename(image_name)}.jpg')
     with open(filepath, 'wb') as file:
         file.write(response.content)
@@ -29,12 +29,15 @@ def check_for_redirect(response):
         raise requests.HTTPError('Ответ пришёл с главной, а не с запрошенной страницы')
 
 
-def parse_book_page(url, book_id):
-    book = {}
+def get_soup(url):
     response = requests.get(url)
     response.raise_for_status()
-
     soup = BeautifulSoup(response.text, 'lxml')
+    return soup
+
+
+def parse_book_page(url, soup, book_id):
+    book = {}
     
     book_cover_relative_link = soup.find('div', class_='bookimage').find('img')['src']
     book['cover_link'] = urljoin(url, book_cover_relative_link)
@@ -75,8 +78,8 @@ def main():
     os.makedirs('books', exist_ok=True)
     os.makedirs('images', exist_ok=True)
 
-    for number in range(start_id, end_id + 1):
-        book_download_link = f'https://tululu.org/txt.php?id={number}'
+    for book_id in range(start_id, end_id + 1):
+        book_download_link = f'https://tululu.org/txt.php?id={book_id}'
         response = requests.get(book_download_link)
         response.raise_for_status()
 
@@ -85,11 +88,12 @@ def main():
         except requests.HTTPError:
             continue
 
-        book_link = f'https://tululu.org/b{number}/'
-        book = parse_book_page(book_link, number)
+        book_link = f'https://tululu.org/b{book_id}/'
+        soup = get_soup(book_link)
+        book = parse_book_page(book_link, soup, book_id)
         
         download_txt(book_download_link, book['title'])
-        download_image(book['cover_link'], number)
+        download_image(book['cover_link'], book_id)
 
 
 if __name__ == '__main__':
