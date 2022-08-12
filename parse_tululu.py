@@ -15,10 +15,9 @@ def download_txt(url, filename, folder='books/'):
         file.write(response.content)
 
 
-def download_image(url, book_id, folder='covers/'):
+def download_image(url, image_name, folder='covers/'):
     response = requests.get(url)
     response.raise_for_status()
-    image_name = f'image_{book_id}'
     filepath = os.path.join(f'{folder}{sanitize_filename(image_name)}.jpg')
     with open(filepath, 'wb') as file:
         file.write(response.content)
@@ -93,7 +92,7 @@ def main():
         book = parse_book_page(book_link, soup, book_id)
         
         download_txt(book_download_link, book['title'])
-        download_image(book['cover_link'], book_id)
+        download_image(book['cover_link'], book['title'])
 
 
 if __name__ == '__main__':
