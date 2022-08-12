@@ -65,10 +65,10 @@ def parse_book_page(url, soup, book_id):
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Описание что делает программа'
+        description='Скрипт скачивает книги с сайта "https://tululu.org/"'
     )
     parser.add_argument('-s', '--start_id', help='С какого id книги начать скачивание', type=int, default=1)
-    parser.add_argument('-e', '--end_id', help='На каком id книги закончить скачивание', type=int, default=11)
+    parser.add_argument('-e', '--end_id', help='На каком id книги закончить скачивание', type=int, default=10)
     args = parser.parse_args()
     
     start_id = args.start_id
