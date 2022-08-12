@@ -29,31 +29,33 @@ def check_for_redirect(response):
 
 
 def parse_book_page(url, book_id):
+    book = {}
     response = requests.get(url)
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, 'lxml')
     
     book_cover_relative_link = soup.find('div', class_='bookimage').find('img')['src']
-    book_cover_link = urljoin(url, book_cover_relative_link)
+    book['cover_link'] = urljoin(url, book_cover_relative_link)
     
     title_tag = soup.find('h1')
     book_title = title_tag.text.split('::')[0].strip()
-    book_author = title_tag.text.split('::')[1].strip()
-    full_book_title = f'{book_id}. {book_title}'
+    book['author'] = title_tag.text.split('::')[1].strip()
+    book['title'] = f'{book_id}. {book_title}'
     
     comments_tag = soup.find_all('div', class_='texts')
-    
     book_comments = []
     for book_comment in comments_tag:
         book_comments.append(book_comment.find('span').text)
+    book['comments'] = book_comments
+        
     genres_tag = soup.find('span', class_='d_book').find_all('a')
-    
     book_genres = []
     for book_genre in genres_tag:
         book_genres.append(book_genre.text)
+    book['genres'] = book_genres
         
-    return full_book_title, book_cover_link, book_comments, book_genres
+    return book
 
 
 def main():
@@ -74,10 +76,10 @@ def main():
             continue
 
         book_link = f'https://tululu.org/b{number}/'
-        book_title, book_cover_link, book_comments, books_genres = parse_book_page(book_link, number)
+        book = parse_book_page(book_link, number)
         
-        download_txt(book_download_link, book_title, folder=book_folder)
-        download_image(book_cover_link, number)
+        download_txt(book_download_link, book['title'], folder=book_folder)
+        download_image(book['cover_link'], number)
 
 
 if __name__ == '__main__':
