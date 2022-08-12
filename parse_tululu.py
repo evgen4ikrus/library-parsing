@@ -65,8 +65,7 @@ def parse_book_page(url, soup, book_id):
     return book
 
 
-def main():
-
+def get_args():
     parser = argparse.ArgumentParser(
         description='Скрипт скачивает книги с сайта "https://tululu.org/"'
     )
@@ -85,13 +84,17 @@ def main():
         default=10
     )
     args = parser.parse_args()
-
     start_id = args.start_id
     end_id = args.end_id
+    return start_id, end_id
+
+
+def main():
 
     load_dotenv()
     os.makedirs('books', exist_ok=True)
     os.makedirs('covers', exist_ok=True)
+    start_id, end_id = get_args()
 
     for book_id in range(start_id, end_id + 1):
         book_download_link = f'https://tululu.org/txt.php?id={book_id}'
