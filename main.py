@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
+import argparse
 
 
 def download_txt(url, filename, folder='books/'):
@@ -60,12 +61,21 @@ def parse_book_page(url, book_id):
 
 def main():
 
+    parser = argparse.ArgumentParser(
+        description='Описание что делает программа'
+    )
+    parser.add_argument('-s', '--start_id', help='С какого id книги начать скачивание', type=int, default=1)
+    parser.add_argument('-e', '--end_id', help='На каком id книги закончить скачивание', type=int, default=11)
+    args = parser.parse_args()
+    
+    start_id = args.start_id
+    end_id = args.end_id
+    
     load_dotenv()
-    book_folder=os.getenv('BOOK_FOLDER', 'books/')
-    os.makedirs(book_folder, exist_ok=True)
+    os.makedirs('books', exist_ok=True)
     os.makedirs('images', exist_ok=True)
 
-    for number in range(1, 11):
+    for number in range(start_id, end_id + 1):
         book_download_link = f'https://tululu.org/txt.php?id={number}'
         response = requests.get(book_download_link)
         response.raise_for_status()
@@ -78,7 +88,7 @@ def main():
         book_link = f'https://tululu.org/b{number}/'
         book = parse_book_page(book_link, number)
         
-        download_txt(book_download_link, book['title'], folder=book_folder)
+        download_txt(book_download_link, book['title'])
         download_image(book['cover_link'], number)
 
 
