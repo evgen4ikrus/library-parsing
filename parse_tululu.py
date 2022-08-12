@@ -15,7 +15,7 @@ def download_txt(url, filename, folder='books/'):
         file.write(response.content)
 
 
-def download_image(url, book_id, folder='images/'):
+def download_image(url, book_id, folder='covers/'):
     response = requests.get(url)
     response.raise_for_status()
     image_name = f'image_{book_id}'
@@ -76,7 +76,7 @@ def main():
     
     load_dotenv()
     os.makedirs('books', exist_ok=True)
-    os.makedirs('images', exist_ok=True)
+    os.makedirs('covers', exist_ok=True)
 
     for book_id in range(start_id, end_id + 1):
         book_download_link = f'https://tululu.org/txt.php?id={book_id}'
