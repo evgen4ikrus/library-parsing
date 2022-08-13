@@ -39,9 +39,7 @@ def parse_book_page(url, html_content, book_id):
     book_cover_link = urljoin(url, book_cover_relative_link)
 
     book_title, book_author = soup.find('h1').text.split('::')
-    book_title = book_title.strip()
-    book_author = book_author.strip()
-    book_full_title = f'{book_id}. {book_title}'
+    book_full_title = f'{book_id}. {book_title.strip()}'
 
     comments_tag = soup.find_all('div', class_='texts')
     book_comments = [book_comment.find('span').text for book_comment in comments_tag]
@@ -51,7 +49,7 @@ def parse_book_page(url, html_content, book_id):
 
     book = {
         'title': book_full_title,
-        'author': book_author,
+        'author': book_author.strip(),
         'comments': book_comments,
         'genres': book_genres,
         'cover_link': book_cover_link,
