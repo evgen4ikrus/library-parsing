@@ -4,7 +4,6 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 from pathvalidate import sanitize_filename
 
 
@@ -91,7 +90,6 @@ def get_args():
 
 def main():
 
-    load_dotenv()
     os.makedirs('books', exist_ok=True)
     os.makedirs('covers', exist_ok=True)
     start_id, end_id = get_args()
