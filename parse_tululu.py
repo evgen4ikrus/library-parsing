@@ -5,15 +5,14 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+from requests.exceptions import HTTPError
 from pathvalidate import sanitize_filename
 
 
-def download_txt(url, filename, books_path):
+def download_txt(book_text, filename, books_path):
     filepath = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
-    response = requests.get(url)
-    response.raise_for_status()
     with open(filepath, 'w', encoding="utf-16") as file:
-        file.write(response.text)
+        file.write(book_text)
 
 
 def download_image(url, image_name, covers_pach):
@@ -24,11 +23,16 @@ def download_image(url, image_name, covers_pach):
         file.write(response.content)
 
 
-def check_for_redirect(response):
-    if response.history:
-        raise requests.HTTPError(
-            'Ответ пришёл с главной, а не с запрошенной страницы'
-        )
+def raise_for_redirect(request_history):
+    if request_history:
+        raise HTTPError
+
+
+def get_book_text(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    raise_for_redirect(response.history)
+    return response.text
 
 
 def parse_book_page(url, html_content, book_id):
@@ -90,23 +94,22 @@ def main():
     start_id, end_id = get_args()
 
     for book_id in range(start_id, end_id + 1):
-        book_download_link = f'https://tululu.org/txt.php?id={book_id}'
-        response = requests.get(book_download_link)
-        response.raise_for_status()
 
         try:
-            check_for_redirect(response)
-        except requests.HTTPError:
-            continue
+            book_download_link = f'https://tululu.org/txt.php?id={book_id}'
+            book_text = get_book_text(book_download_link)
 
-        book_link = f'https://tululu.org/b{book_id}/'
-        response = requests.get(book_link)
-        response.raise_for_status()
-        html_content = response.text
-        book = parse_book_page(book_link, html_content, book_id)
+            book_link = f'https://tululu.org/b{book_id}/'
+            response = requests.get(book_link)
+            response.raise_for_status()
+            html_content = response.text
+            book = parse_book_page(book_link, html_content, book_id)
 
-        download_txt(book_download_link, book['title'], books_path)
-        download_image(book['cover_link'], book['title'], covers_pach)
+            download_txt(book_text, book['title'], books_path)
+            download_image(book['cover_link'], book['title'], covers_pach)
+
+        except HTTPError:
+            print(f'Книги с id={book_id} нет на сайте')
 
 
 if __name__ == '__main__':
