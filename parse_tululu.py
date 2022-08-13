@@ -1,12 +1,13 @@
 import argparse
 import os
 from pathlib import Path
+from time import sleep
 from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
-from requests.exceptions import HTTPError
 from pathvalidate import sanitize_filename
+from requests.exceptions import ConnectionError, HTTPError
 
 
 def download_txt(book_text, filename, books_path):
@@ -18,7 +19,10 @@ def download_txt(book_text, filename, books_path):
 def download_image(url, image_name, covers_pach):
     response = requests.get(url)
     response.raise_for_status()
-    filepath = os.path.join(covers_pach, f'{sanitize_filename(image_name)}.jpg')
+    filepath = os.path.join(
+        covers_pach,
+        f'{sanitize_filename(image_name)}.jpg'
+    )
     with open(filepath, 'wb') as file:
         file.write(response.content)
 
@@ -36,7 +40,7 @@ def get_book_text(url):
 
 
 def parse_book_page(url, html_content, book_id):
-    
+
     soup = BeautifulSoup(html_content, 'lxml')
     book_cover_relative_link = soup.find('div',
                                          class_='bookimage').find('img')['src']
@@ -91,9 +95,10 @@ def main():
     covers_pach = 'covers'
     Path(books_path).mkdir(exist_ok=True, parents=True)
     Path(covers_pach).mkdir(exist_ok=True, parents=True)
-    start_id, end_id = get_args()
+    book_id, end_id = get_args()
 
-    for book_id in range(start_id, end_id + 1):
+    while book_id <= end_id:
+        success_iteration = True
 
         try:
             book_download_link = f'https://tululu.org/txt.php?id={book_id}'
@@ -111,6 +116,13 @@ def main():
         except HTTPError:
             print(f'Книги с id={book_id} нет на сайте')
 
+        except ConnectionError:
+            print('Связь с интернетом потеряна, ожидание подключения...')
+            sleep(10)
+            success_iteration = False
+
+        if success_iteration:
+            book_id += 1
 
 if __name__ == '__main__':
     main()
