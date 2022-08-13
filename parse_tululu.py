@@ -43,14 +43,10 @@ def parse_book_page(url, html_content, book_id):
     book_full_title = f'{book_id}. {book_title}'
 
     comments_tag = soup.find_all('div', class_='texts')
-    book_comments = []
-    for book_comment in comments_tag:
-        book_comments.append(book_comment.find('span').text)
+    book_comments = [book_comment.find('span').text for book_comment in comments_tag]
 
     genres_tag = soup.find('span', class_='d_book').find_all('a')
-    book_genres = []
-    for book_genre in genres_tag:
-        book_genres.append(book_genre.text)
+    book_genres = [book_genre.text for book_genre in genres_tag]
 
     book = {
         'title': book_full_title,
