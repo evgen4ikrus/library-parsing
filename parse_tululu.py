@@ -38,29 +38,33 @@ def get_soup(url):
 
 
 def parse_book_page(url, soup, book_id):
-    book = {}
 
     book_cover_relative_link = soup.find('div',
                                          class_='bookimage').find('img')['src']
-    book['cover_link'] = urljoin(url, book_cover_relative_link)
+    book_cover_link = urljoin(url, book_cover_relative_link)
 
     title_tag = soup.find('h1')
     book_title = title_tag.text.split('::')[0].strip()
-    book['author'] = title_tag.text.split('::')[1].strip()
-    book['title'] = f'{book_id}. {book_title}'
+    book_author = title_tag.text.split('::')[1].strip()
+    book_full_title = f'{book_id}. {book_title}'
 
     comments_tag = soup.find_all('div', class_='texts')
     book_comments = []
     for book_comment in comments_tag:
         book_comments.append(book_comment.find('span').text)
-    book['comments'] = book_comments
 
     genres_tag = soup.find('span', class_='d_book').find_all('a')
     book_genres = []
     for book_genre in genres_tag:
         book_genres.append(book_genre.text)
-    book['genres'] = book_genres
 
+    book = {
+        'title': book_full_title,
+        'author': book_author,
+        'comments': book_comments,
+        'genres': book_genres,
+        'cover_link': book_cover_link,
+    }
     return book
 
 
