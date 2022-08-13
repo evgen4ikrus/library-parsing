@@ -37,9 +37,9 @@ def parse_book_page(url, html_content, book_id):
                                          class_='bookimage').find('img')['src']
     book_cover_link = urljoin(url, book_cover_relative_link)
 
-    title_tag = soup.find('h1')
-    book_title = title_tag.text.split('::')[0].strip()
-    book_author = title_tag.text.split('::')[1].strip()
+    book_title, book_author = soup.find('h1').text.split('::')
+    book_title = book_title.strip()
+    book_author = book_author.strip()
     book_full_title = f'{book_id}. {book_title}'
 
     comments_tag = soup.find_all('div', class_='texts')
