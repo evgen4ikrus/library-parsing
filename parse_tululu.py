@@ -11,8 +11,8 @@ def download_txt(url, filename, folder='books/'):
     filepath = os.path.join(f'{folder}{sanitize_filename(filename)}.txt')
     response = requests.get(url)
     response.raise_for_status()
-    with open(filepath, 'wb') as file:
-        file.write(response.content)
+    with open(filepath, 'w', encoding="utf-16") as file:
+        file.write(response.text)
 
 
 def download_image(url, image_name, folder='covers/'):
