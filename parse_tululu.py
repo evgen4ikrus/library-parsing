@@ -1,5 +1,6 @@
 import argparse
 import os
+from pathlib import Path
 from urllib.parse import urljoin
 
 import requests
@@ -7,18 +8,18 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def download_txt(url, filename, folder='books/'):
-    filepath = os.path.join(f'{folder}{sanitize_filename(filename)}.txt')
+def download_txt(url, filename, books_path):
+    filepath = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
     response = requests.get(url)
     response.raise_for_status()
     with open(filepath, 'w', encoding="utf-16") as file:
         file.write(response.text)
 
 
-def download_image(url, image_name, folder='covers/'):
+def download_image(url, image_name, covers_pach):
     response = requests.get(url)
     response.raise_for_status()
-    filepath = os.path.join(f'{folder}{sanitize_filename(image_name)}.jpg')
+    filepath = os.path.join(covers_pach, f'{sanitize_filename(image_name)}.jpg')
     with open(filepath, 'wb') as file:
         file.write(response.content)
 
@@ -84,8 +85,10 @@ def get_args():
 
 def main():
 
-    os.makedirs('books', exist_ok=True)
-    os.makedirs('covers', exist_ok=True)
+    books_path = 'books'
+    covers_pach = 'covers'
+    Path(books_path).mkdir(exist_ok=True, parents=True)
+    Path(covers_pach).mkdir(exist_ok=True, parents=True)
     start_id, end_id = get_args()
 
     for book_id in range(start_id, end_id + 1):
@@ -104,8 +107,8 @@ def main():
         html_content = response.text
         book = parse_book_page(book_link, html_content, book_id)
 
-        download_txt(book_download_link, book['title'])
-        download_image(book['cover_link'], book['title'])
+        download_txt(book_download_link, book['title'], books_path)
+        download_image(book['cover_link'], book['title'], covers_pach)
 
 
 if __name__ == '__main__':
