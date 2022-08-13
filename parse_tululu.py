@@ -30,15 +30,9 @@ def check_for_redirect(response):
         )
 
 
-def get_soup(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'lxml')
-    return soup
-
-
-def parse_book_page(url, soup, book_id):
-
+def parse_book_page(url, html_content, book_id):
+    
+    soup = BeautifulSoup(html_content, 'lxml')
     book_cover_relative_link = soup.find('div',
                                          class_='bookimage').find('img')['src']
     book_cover_link = urljoin(url, book_cover_relative_link)
@@ -109,8 +103,10 @@ def main():
             continue
 
         book_link = f'https://tululu.org/b{book_id}/'
-        soup = get_soup(book_link)
-        book = parse_book_page(book_link, soup, book_id)
+        response = requests.get(book_link)
+        response.raise_for_status()
+        html_content = response.text
+        book = parse_book_page(book_link, html_content, book_id)
 
         download_txt(book_download_link, book['title'])
         download_image(book['cover_link'], book['title'])
