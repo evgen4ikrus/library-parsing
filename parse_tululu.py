@@ -115,6 +115,8 @@ def main():
 
         except HTTPError:
             print(f'Книги с id={book_id} нет на сайте')
+            book_id += 1
+            continue
 
         except ConnectionError:
             print('Связь с интернетом потеряна, ожидание подключения...')
