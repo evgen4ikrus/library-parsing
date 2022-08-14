@@ -10,15 +10,19 @@ from pathvalidate import sanitize_filename
 from requests.exceptions import ConnectionError, HTTPError
 
 
-def download_txt(book_text, filename, books_path):
+def download_txt(url, filename, books_path):
+    response = requests.get(url)
+    response.raise_for_status()
+    raise_for_redirect(response.history)
     filepath = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
     with open(filepath, 'w', encoding="utf-16") as file:
-        file.write(book_text)
+        file.write(response.text)
 
 
 def download_image(url, image_name, covers_pach):
     response = requests.get(url)
     response.raise_for_status()
+    raise_for_redirect(response.history)
     filepath = os.path.join(
         covers_pach,
         f'{sanitize_filename(image_name)}.jpg'
@@ -30,13 +34,6 @@ def download_image(url, image_name, covers_pach):
 def raise_for_redirect(request_history):
     if request_history:
         raise HTTPError
-
-
-def get_book_text(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    raise_for_redirect(response.history)
-    return response.text
 
 
 def parse_book_page(url, html_content, book_id):
@@ -101,16 +98,16 @@ def main():
         success_iteration = True
 
         try:
-            book_download_link = f'https://tululu.org/txt.php?id={book_id}'
-            book_text = get_book_text(book_download_link)
 
             book_link = f'https://tululu.org/b{book_id}/'
             response = requests.get(book_link)
             response.raise_for_status()
+            raise_for_redirect(response.history)
             html_content = response.text
             book = parse_book_page(book_link, html_content, book_id)
 
-            download_txt(book_text, book['title'], books_path)
+            book_download_link = f'https://tululu.org/txt.php?id={book_id}'
+            download_txt(book_download_link, book['title'], books_path)
             download_image(book['cover_link'], book['title'], covers_pach)
 
         except HTTPError:
