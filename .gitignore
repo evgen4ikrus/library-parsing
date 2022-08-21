@@ -163,3 +163,4 @@ cython_debug/
 books/
 images/
 covers
+books_information.json
