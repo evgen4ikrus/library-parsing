@@ -9,7 +9,7 @@ import json
 
 def save_json_file(book):
     book_json = json.dumps(book)
-    with open('books_information.json', 'w', encoding='utf8') as book_json:
+    with open('book_catalog.json', 'w', encoding='utf8') as book_json:
         json.dump(book , book_json, ensure_ascii=False)
 
 def main():
@@ -19,23 +19,21 @@ def main():
     Path(books_path).mkdir(exist_ok=True, parents=True)
     Path(covers_pach).mkdir(exist_ok=True, parents=True)
 
-    url = f'https://tululu.org/l55/'
-    books = []
+    book_catalog = []
 
-    for page in range(4):
+    for page in range(1, 2):
 
-        if page:
-            url = f'https://tululu.org/l55/{page}'
+        url = f'https://tululu.org/l55/{page}'
         response = requests.get(url)
         response.raise_for_status()
         html_content = get_html_content(url)
         soup = BeautifulSoup(html_content, 'lxml')
-        books_tag = soup.find_all('table', class_='d_book')
-
-        for book_tag in books_tag:
+        book_selector = 'table.d_book div.bookimage a'
+        book_pages = soup.select(book_selector)
+        for book_page in book_pages:
 
             try:
-                book_relative_link = book_tag.find('a')['href']
+                book_relative_link = book_page['href']
                 book_id = book_relative_link[2:][:-1]
                 book_link = urljoin(url, book_relative_link)
                 html_content = get_html_content(book_link)
@@ -43,13 +41,13 @@ def main():
                 book = parse_book_page(book_link, html_content, book_id)
                 download_txt(book_download_link, book['title'], books_path)
                 download_image(book['cover_link'], book['title'], covers_pach)
-                books.append(book)
+                book_catalog.append(book)
 
             except HTTPError:
                 print(f'Книги с id={book_id} нет на сайте')
                 continue
 
-    save_json_file(books)
+    save_json_file(book_catalog)
 
 if __name__ == '__main__':
     main()
