@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 from requests.exceptions import HTTPError
 from pathlib import Path
 import json
+import re
 
 
 def save_json_file(book):
@@ -34,7 +35,7 @@ def main():
 
             try:
                 book_relative_link = book_page['href']
-                book_id = book_relative_link[2:][:-1]
+                book_id = re.search(r'\d+', book_relative_link).group()
                 book_link = urljoin(url, book_relative_link)
                 html_content = get_html_content(book_link)
                 book_download_link = f'https://tululu.org/txt.php?id={book_id}'
