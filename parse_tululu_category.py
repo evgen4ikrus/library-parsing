@@ -4,9 +4,7 @@ import os
 import re
 from pathlib import Path
 from time import sleep
-from unicodedata import category
 from urllib.parse import urljoin
-from xmlrpc.client import boolean
 
 import requests
 from bs4 import BeautifulSoup
