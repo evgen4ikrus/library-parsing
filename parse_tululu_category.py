@@ -1,22 +1,25 @@
 import argparse
-from xmlrpc.client import boolean
-import requests
-from parse_tululu import get_html_content, download_txt, parse_book_page, download_image
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-from requests.exceptions import HTTPError, ConnectionError
-from pathlib import Path
 import json
-import re
-from time import sleep
 import os
+import re
+from pathlib import Path
+from time import sleep
+from urllib.parse import urljoin
+from xmlrpc.client import boolean
+
+import requests
+from bs4 import BeautifulSoup
+from requests.exceptions import ConnectionError, HTTPError
+
+from parse_tululu import (download_image, download_txt, get_html_content,
+                          parse_book_page)
 
 
 def save_json_file(book, json_path):
     book_json = json.dumps(book)
     full_json_path = os.path.join(json_path, 'book_catalog.json')
     with open(full_json_path, 'w', encoding='utf8') as book_json:
-        json.dump(book , book_json, ensure_ascii=False)
+        json.dump(book, book_json, ensure_ascii=False)
 
 
 def get_args():
@@ -88,7 +91,7 @@ def create_paths(*args):
 
 
 def main():
-    
+
     args = get_args()
     dest_folder = args['dest_folder']
     books_path = os.path.join(dest_folder, 'books')
@@ -120,7 +123,8 @@ def main():
 
         for book_page in book_pages:
             success_iteration = False
-            while success_iteration == False:
+
+            while not success_iteration:
 
                 try:
                     book_relative_link = book_page['href']
@@ -130,9 +134,11 @@ def main():
                     book_download_link = f'https://tululu.org/txt.php?id={book_id}'
                     book = parse_book_page(book_link, html_content, book_id)
                     if not args['skip_txt']:
-                        download_txt(book_download_link, book['title'], books_path)
+                        download_txt(book_download_link,
+                                     book['title'], books_path)
                     if not args['skip_imgs']:
-                        download_image(book['cover_link'], book['title'], covers_path)
+                        download_image(book['cover_link'],
+                                       book['title'], covers_path)
                     book_catalog.append(book)
 
                 except HTTPError:
@@ -140,7 +146,7 @@ def main():
                     success_iteration = True
 
                 except ConnectionError:
-                    print('Связь с интернетом потеряна, ожидание подключения.')
+                    print('Связь с интернетом потеряна, ожидание подключения...')
                     sleep(5)
                     continue
 
