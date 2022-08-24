@@ -4,6 +4,7 @@ import os
 import re
 from pathlib import Path
 from time import sleep
+from unicodedata import category
 from urllib.parse import urljoin
 from xmlrpc.client import boolean
 
@@ -24,7 +25,14 @@ def save_json_file(book, json_path):
 
 def get_args():
     parser = argparse.ArgumentParser(
-        description='Скрипт скачивает книги с сайта "https://tululu.org/" по жанрам'
+        description='Скрипт скачивает книги с сайта "https://tululu.org/" по категориям'
+    )
+    parser.add_argument(
+        '-c',
+        '--category_id',
+        help='Указать ID категории книг',
+        type=int,
+        default=55
     )
     parser.add_argument(
         '-s',
@@ -74,6 +82,7 @@ def get_args():
         'json_path': args.json_path,
         'skip_imgs': args.skip_imgs,
         'skip_txt': args.skip_txt,
+        'category_id': args.category_id,
     }
     return args
 
@@ -99,12 +108,13 @@ def main():
     json_path = get_json_path(args)
     create_paths(books_path, covers_path, json_path)
     start_page, end_page = args['start_page'], args['end_page']
+    category_id = args['category_id']
     book_catalog = []
 
     while start_page < end_page:
 
         try:
-            url = f'https://tululu.org/l55/{start_page}'
+            url = f'https://tululu.org/l{category_id}/{start_page}'
             response = requests.get(url)
             response.raise_for_status()
             html_content = get_html_content(url)
