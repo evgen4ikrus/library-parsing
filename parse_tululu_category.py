@@ -1,4 +1,5 @@
 import argparse
+from xmlrpc.client import boolean
 import requests
 from parse_tululu import get_html_content, download_txt, parse_book_page, download_image
 from bs4 import BeautifulSoup
@@ -8,11 +9,13 @@ from pathlib import Path
 import json
 import re
 from time import sleep
+import os
 
 
-def save_json_file(book):
+def save_json_file(book, json_path):
     book_json = json.dumps(book)
-    with open('book_catalog.json', 'w', encoding='utf8') as book_json:
+    full_json_path = os.path.join(json_path, 'book_catalog.json')
+    with open(full_json_path, 'w', encoding='utf8') as book_json:
         json.dump(book , book_json, ensure_ascii=False)
 
 
@@ -34,19 +37,65 @@ def get_args():
         type=int,
         default=float('inf')
     )
+    parser.add_argument(
+        '-а',
+        '--dest_folder',
+        help='Путь к каталогу с результатами парсинга: картинкам, книгам, JSON',
+        type=str,
+        default='my_library'
+    )
+    parser.add_argument(
+        '-j',
+        '--json_path',
+        help='Указать свой путь к *.json файлу с результатами',
+        type=str,
+        default=''
+    )
+    parser.add_argument(
+        '-si',
+        '--skip_imgs',
+        action='store_true',
+        help='Не скачивать картинки'
+    )
+    parser.add_argument(
+        '-st',
+        '--skip_txt',
+        action='store_true',
+        help='Не скачивать книги'
+    )
     args = parser.parse_args()
-    start_page = args.start_page
-    end_page = args.end_page
-    return start_page, end_page
+    args = {
+        'start_page': args.start_page,
+        'end_page': args.end_page,
+        'dest_folder': args.dest_folder,
+        'json_path': args.json_path,
+        'skip_imgs': args.skip_imgs,
+        'skip_txt': args.skip_txt,
+    }
+    return args
+
+
+def get_json_path(args):
+    if args['json_path']:
+        json_path = os.path.join(args['json_path'])
+        return json_path
+    return args['dest_folder']
+
+
+def create_paths(*args):
+    for path in args:
+        Path(path).mkdir(exist_ok=True, parents=True)
 
 
 def main():
     
-    books_path = 'books'
-    covers_pach = 'covers'
-    Path(books_path).mkdir(exist_ok=True, parents=True)
-    Path(covers_pach).mkdir(exist_ok=True, parents=True)
-    start_page, end_page = get_args()
+    args = get_args()
+    dest_folder = args['dest_folder']
+    books_path = os.path.join(dest_folder, 'books')
+    covers_path = os.path.join(dest_folder, 'covers')
+    json_path = get_json_path(args)
+    create_paths(books_path, covers_path, json_path)
+    start_page, end_page = args['start_page'], args['end_page']
     book_catalog = []
 
     while start_page < end_page:
@@ -80,8 +129,10 @@ def main():
                     html_content = get_html_content(book_link)
                     book_download_link = f'https://tululu.org/txt.php?id={book_id}'
                     book = parse_book_page(book_link, html_content, book_id)
-                    download_txt(book_download_link, book['title'], books_path)
-                    download_image(book['cover_link'], book['title'], covers_pach)
+                    if not args['skip_txt']:
+                        download_txt(book_download_link, book['title'], books_path)
+                    if not args['skip_imgs']:
+                        download_image(book['cover_link'], book['title'], covers_path)
                     book_catalog.append(book)
 
                 except HTTPError:
@@ -97,7 +148,7 @@ def main():
 
         start_page += 1
 
-    save_json_file(book_catalog)
+    save_json_file(book_catalog, json_path)
     print('Скачивание книг завершено')
 
 
