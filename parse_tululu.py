@@ -86,14 +86,6 @@ def get_args():
     return start_id, end_id
 
 
-def get_html_content(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    raise_for_redirect(response.history)
-    html_content = response.text
-    return html_content
-
-
 def main():
 
     books_path = 'books'
@@ -108,7 +100,10 @@ def main():
         try:
 
             book_link = f'https://tululu.org/b{book_id}/'
-            html_content = get_html_content(book_link)
+            response = requests.get(book_link)
+            response.raise_for_status()
+            raise_for_redirect(response.history)
+            html_content = response.text
             book = parse_book_page(book_link, html_content, book_id)
 
             book_download_link = f'https://tululu.org/txt.php?id={book_id}'
