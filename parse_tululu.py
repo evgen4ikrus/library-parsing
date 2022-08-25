@@ -109,8 +109,10 @@ def main():
             book = parse_book_page(book_link, html_content, book_id)
 
             book_download_link = f'https://tululu.org/txt.php'
-            download_txt(book_download_link, book_id, book['title'], books_path)
-            download_image(book['cover_link'], book_id, book['title'], covers_pach)
+            download_txt(book_download_link, book_id,
+                         book['title'], books_path)
+            download_image(book['cover_link'], book_id,
+                           book['title'], covers_pach)
 
         except HTTPError:
             print(f'Книги с id={book_id} нет на сайте')
