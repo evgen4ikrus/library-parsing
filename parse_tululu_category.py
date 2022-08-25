@@ -50,14 +50,12 @@ def get_args():
         '-а',
         '--dest_folder',
         help='Путь к каталогу с результатами парсинга: картинкам, книгам, JSON',
-        type=str,
         default='my_library'
     )
     parser.add_argument(
         '-j',
         '--json_path',
         help='Указать свой путь к *.json файлу с результатами',
-        type=str,
         default=''
     )
     parser.add_argument(
@@ -73,23 +71,14 @@ def get_args():
         help='Не скачивать книги'
     )
     args = parser.parse_args()
-    args = {
-        'start_page': args.start_page,
-        'end_page': args.end_page,
-        'dest_folder': args.dest_folder,
-        'json_path': args.json_path,
-        'skip_imgs': args.skip_imgs,
-        'skip_txt': args.skip_txt,
-        'category_id': args.category_id,
-    }
     return args
 
 
 def get_json_path(args):
-    if args['json_path']:
-        json_path = os.path.join(args['json_path'])
+    if args.json_path:
+        json_path = os.path.join(args.json_path)
         return json_path
-    return args['dest_folder']
+    return args.dest_folder
 
 
 def create_paths(*args):
@@ -100,13 +89,13 @@ def create_paths(*args):
 def main():
 
     args = get_args()
-    dest_folder = args['dest_folder']
+    dest_folder = args.dest_folder
     books_path = os.path.join(dest_folder, 'books')
     covers_path = os.path.join(dest_folder, 'covers')
     json_path = get_json_path(args)
     create_paths(books_path, covers_path, json_path)
-    start_page, end_page = args['start_page'], args['end_page']
-    category_id = args['category_id']
+    start_page, end_page = args.start_page, args.end_page
+    category_id = args.category_id
     book_catalog = []
 
     while start_page < end_page:
@@ -141,10 +130,10 @@ def main():
                     html_content = get_html_content(book_link)
                     book_download_link = f'https://tululu.org/txt.php?id={book_id}'
                     book = parse_book_page(book_link, html_content, book_id)
-                    if not args['skip_txt']:
+                    if not args.skip_txt:
                         download_txt(book_download_link,
                                      book['title'], books_path)
-                    if not args['skip_imgs']:
+                    if not args.skip_imgs:
                         download_image(book['cover_link'],
                                        book['title'], covers_path)
                     book_catalog.append(book)
