@@ -10,7 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import ConnectionError, HTTPError
 
-from parse_tululu import (download_image, download_txt, get_html_content,
+from parse_tululu import (download_image, download_txt,
                           parse_book_page, raise_for_redirect)
 
 
@@ -104,7 +104,8 @@ def main():
             url = f'https://tululu.org/l{category_id}/{start_page}'
             response = requests.get(url)
             response.raise_for_status()
-            html_content = get_html_content(url)
+            raise_for_redirect(response.history)
+            html_content = response.text
             soup = BeautifulSoup(html_content, 'lxml')
             book_selector = 'table.d_book div.bookimage a'
             book_pages = soup.select(book_selector)
@@ -125,20 +126,20 @@ def main():
 
                 try:
                     book_relative_link = book_page['href']
-                    book_id = re.search(r'\d+', book_relative_link).group()
                     book_link = urljoin(url, book_relative_link)
                     response = requests.get(book_link)
                     response.raise_for_status()
                     raise_for_redirect(response.history)
                     html_content = response.text
 
-                    book_download_link = f'https://tululu.org/txt.php?id={book_id}'
+                    book_id = re.search(r'\d+', book_relative_link).group()
+                    book_download_link = f'https://tululu.org/txt.php'
                     book = parse_book_page(book_link, html_content, book_id)
                     if not args.skip_txt:
-                        download_txt(book_download_link,
+                        download_txt(book_download_link, book_id,
                                      book['title'], books_path)
                     if not args.skip_imgs:
-                        download_image(book['cover_link'],
+                        download_image(book['cover_link'], book_id,
                                        book['title'], covers_path)
                     book_catalog.append(book)
 

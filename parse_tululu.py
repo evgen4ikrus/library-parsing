@@ -10,8 +10,9 @@ from pathvalidate import sanitize_filename
 from requests.exceptions import ConnectionError, HTTPError
 
 
-def download_txt(url, filename, books_path):
-    response = requests.get(url)
+def download_txt(url, book_id, filename, books_path):
+    params = {'id': book_id}
+    response = requests.get(url, params=params)
     response.raise_for_status()
     raise_for_redirect(response.history)
     filepath = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
@@ -19,8 +20,9 @@ def download_txt(url, filename, books_path):
         file.write(response.text)
 
 
-def download_image(url, image_name, covers_pach):
-    response = requests.get(url)
+def download_image(url, book_id, image_name, covers_pach):
+    params = {'id': book_id}
+    response = requests.get(url, params=params)
     response.raise_for_status()
     raise_for_redirect(response.history)
     filepath = os.path.join(
@@ -106,9 +108,9 @@ def main():
             html_content = response.text
             book = parse_book_page(book_link, html_content, book_id)
 
-            book_download_link = f'https://tululu.org/txt.php?id={book_id}'
-            download_txt(book_download_link, book['title'], books_path)
-            download_image(book['cover_link'], book['title'], covers_pach)
+            book_download_link = f'https://tululu.org/txt.php'
+            download_txt(book_download_link, book_id, book['title'], books_path)
+            download_image(book['cover_link'], book_id, book['title'], covers_pach)
 
         except HTTPError:
             print(f'Книги с id={book_id} нет на сайте')
