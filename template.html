@@ -20,7 +20,7 @@
             <div class="card mb-3" style="max-width: 540px;">
               <div class="row no-gutters">
                 <div class="col-md-4">
-                  <img src="my_library/covers/{{ book.title }}.jpg"
+                  <img src="{{ book.img_src|urlencode }}"
                        class="card-img"
                        alt="Book cover: {{ book.title }}">
                 </div>
@@ -28,11 +28,11 @@
                   <div class="card-body">
                     <h5 class="card-title">{{ book.title }}</h5>
                     <h6 class="card-title">{{ book.author }}</h6>
-                    <a href="my_library/books/{{ book.title }}.txt">Read</a>
+                    <a href="{{ book.book_path|urlencode }}" target="_blank">Read</a>
                     <p class="card-text">
                     </p>
                     <p class="card-text">
-                      <small class="text-muted">Last updated 3 mins ago</small>
+                      <small class="text-muted">Last updated 3 mins ag</small>
                     </p>
                   </div>
                 </div>
