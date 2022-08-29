@@ -1,6 +1,8 @@
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import json
 from livereload import Server
+from more_itertools import chunked
+import os
 
 
 env = Environment(
@@ -10,23 +12,30 @@ env = Environment(
 
 
 def rebuild():
-    
+
     template = env.get_template('template.html')
     with open("my_library/book_catalog.json", "r", encoding='utf8') as my_file:
         book_catalog_json = my_file.read()
 
+    folder_path = 'pages'
+    os.makedirs(folder_path, exist_ok=True)
+    books = json.loads(book_catalog_json)
+    books_on_pages  = list(chunked(books, 4))
 
-    book_catalog = json.loads(book_catalog_json)
-    rendered_page = template.render(
-        book_catalog=book_catalog,
-    )
+    for page_num, books_on_page in enumerate(books_on_pages, start=1):
+        file_name = f'index{page_num}.html'
+        file_path = os.path.join(folder_path, file_name)
+        
+        rendered_page = template.render(
+            books_on_page=books_on_page,
+        )
 
-    with open('index.html', 'w', encoding="utf8") as file:
-        file.write(rendered_page)
+        with open(file_path, 'w', encoding="utf8") as file:
+            file.write(rendered_page)
 
 
 if __name__ == '__main__':
-    
+
     server = Server()
     server.watch('template.html', rebuild)
     server.serve(root='.')
