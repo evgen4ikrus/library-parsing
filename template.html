@@ -13,10 +13,8 @@
   <body>
     <div class="container">
 
-      <h1 class="text-center mb-4">Моя библиотека</h1>
-
-      <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center mb-5">
+      <nav class="m-4" aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
           <li class="page-item {% if page_num == 1 %} disabled {% endif %}">
             <a class="page-link" href="index{{ page_num - 1 }}.html">Назад</a>
           </li>
@@ -50,7 +48,7 @@
                     <p class="card-text">
                     </p>
                     <p class="card-text">
-                      <small class="text-muted">Last updated 3 mins ag</small>
+                      <small class="text-muted">Last updated 3 mins ago</small>
                     </p>
                   </div>
                 </div>
