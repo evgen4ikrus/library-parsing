@@ -50,7 +50,7 @@ def get_args():
         '-а',
         '--dest_folder',
         help='Путь к каталогу с результатами парсинга: картинкам, книгам, JSON',
-        default='my_library'
+        default='media'
     )
     parser.add_argument(
         '-j',
