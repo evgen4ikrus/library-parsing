@@ -46,9 +46,10 @@ def parse_book_page(url, html_content, book_id, books_pach, covers_pach):
     book_cover_link = urljoin(url, book_cover_relative_link)
 
     book_title, book_author = soup.find('h1').text.split('::')
-    book_full_title = f'{book_id}. {book_title.strip()}'
-    img_src = os.path.join(covers_pach, f'{book_full_title}.jpg')
-    book_path = os.path.join(books_pach, f'{book_full_title}.txt')
+    book_title = book_title.strip()
+
+    img_src = os.path.join(covers_pach, f'{sanitize_filename(book_title)}.jpg')
+    book_path = os.path.join(books_pach, f'{sanitize_filename(book_title)}.txt')
 
     comments_tag = soup.find_all('div', class_='texts')
     book_comments = [book_comment.find('span').text for book_comment in comments_tag]
@@ -57,7 +58,7 @@ def parse_book_page(url, html_content, book_id, books_pach, covers_pach):
     book_genres = [book_genre.text for book_genre in genres_tag]
 
     book = {
-        'title': book_full_title,
+        'title': book_title,
         'author': book_author.strip(),
         'img_src': img_src,
         'book_path': book_path,
