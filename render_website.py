@@ -17,11 +17,10 @@ def rebuild():
     books_per_page = 10
     
     with open("media/book_catalog.json", "r", encoding='utf8') as my_file:
-        book_catalog_json = my_file.read()
+        books = json.load(my_file)
 
     folder_path = 'pages'
     os.makedirs(folder_path, exist_ok=True)
-    books = json.loads(book_catalog_json)
     books_on_pages  = list(chunked(books, books_per_page))
 
     for page_num, books_on_page in enumerate(books_on_pages, start=1):
