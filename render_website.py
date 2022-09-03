@@ -1,9 +1,9 @@
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 import json
-from livereload import Server
-from more_itertools import chunked
 import os
 
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from livereload import Server
+from more_itertools import chunked
 
 env = Environment(
     loader=FileSystemLoader('.'),

@@ -38,7 +38,7 @@ def raise_for_redirect(request_history):
         raise HTTPError
 
 
-def parse_book_page(url, html_content, book_id, books_pach, covers_pach):
+def parse_book_page(url, html_content, books_pach, covers_pach):
 
     soup = BeautifulSoup(html_content, 'lxml')
     book_cover_relative_link = soup.find('div',
@@ -48,8 +48,10 @@ def parse_book_page(url, html_content, book_id, books_pach, covers_pach):
     book_title, book_author = soup.find('h1').text.split('::')
     book_title = book_title.strip()
 
-    img_src = os.path.join('..' , covers_pach, f'{sanitize_filename(book_title)}.jpg').replace('\\', '/')
-    book_path = os.path.join('..', books_pach, f'{sanitize_filename(book_title)}.txt').replace('\\', '/')
+    img_src = os.path.join('..' , covers_pach, f'{sanitize_filename(book_title)}.jpg') \
+        .replace('\\', '/')
+    book_path = os.path.join('..', books_pach, f'{sanitize_filename(book_title)}.txt') \
+        .replace('\\', '/')
 
     comments_tag = soup.find_all('div', class_='texts')
     book_comments = [book_comment.find('span').text for book_comment in comments_tag]
@@ -111,7 +113,7 @@ def main():
             response.raise_for_status()
             raise_for_redirect(response.history)
             html_content = response.text
-            book = parse_book_page(book_link, html_content, book_id, books_path, covers_pach)
+            book = parse_book_page(book_link, html_content, books_path, covers_pach)
 
             book_download_link = f'https://tululu.org/txt.php'
             download_txt(book_download_link, book_id,

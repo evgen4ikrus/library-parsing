@@ -10,8 +10,8 @@ import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import ConnectionError, HTTPError
 
-from parse_tululu import (download_image, download_txt,
-                          parse_book_page, raise_for_redirect)
+from parse_tululu import (download_image, download_txt, parse_book_page,
+                          raise_for_redirect)
 
 
 def save_json_file(book, json_path):
@@ -134,7 +134,7 @@ def main():
 
                     book_id = re.search(r'\d+', book_relative_link).group()
                     book_download_link = f'https://tululu.org/txt.php'
-                    book = parse_book_page(book_link, html_content, book_id, books_path, covers_path)
+                    book = parse_book_page(book_link, html_content, books_path, covers_path)
                     if not args.skip_txt:
                         download_txt(book_download_link, book_id,
                                      book['title'], books_path)
