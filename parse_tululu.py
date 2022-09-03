@@ -48,8 +48,8 @@ def parse_book_page(url, html_content, book_id, books_pach, covers_pach):
     book_title, book_author = soup.find('h1').text.split('::')
     book_title = book_title.strip()
 
-    img_src = os.path.join(covers_pach, f'{sanitize_filename(book_title)}.jpg')
-    book_path = os.path.join(books_pach, f'{sanitize_filename(book_title)}.txt')
+    img_src = os.path.join('..' , covers_pach, f'{sanitize_filename(book_title)}.jpg').replace('\\', '/')
+    book_path = os.path.join('..', books_pach, f'{sanitize_filename(book_title)}.txt').replace('\\', '/')
 
     comments_tag = soup.find_all('div', class_='texts')
     book_comments = [book_comment.find('span').text for book_comment in comments_tag]
