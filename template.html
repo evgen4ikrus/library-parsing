@@ -41,9 +41,9 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <h5 class="card-title">{{ book.title }}</h5>
-                    <h6 class="card-title">{{ book.author }}</h6>
+                    <h6 class="card-title mb-3">{{ book.author }}</h6>
                     {% for genrу in book.genres %}
-                      <span class="badge badge-light mt-3 mb-3">{{ genrу }}</span>
+                      <span class="badge badge-light">{{ genrу }}</span>
                     {% endfor %}<br>
                     <a href="../{{ book.book_path}}" target="_blank">Читать</a>
                   </div>
