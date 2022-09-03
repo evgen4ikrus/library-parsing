@@ -7,7 +7,7 @@
     <link rel="stylesheet"
           href="../static/css/bootstrap.min.css">
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon">
-    <title>Моя библиотека</title>
+    <title>Моя библиотек</title>
   </head>
   <body>
     <div class="container">
@@ -41,7 +41,7 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <h5 class="card-title">{{ book.title }}</h5>
-                    <h6 class="card-title mb-1">{{ book.author }}</h6>
+                    <h6 class="card-title mb-3">{{ book.author }}</h6>
                     {% for genrу in book.genres %}
                       <span class="badge badge-light">{{ genrу }}</span>
                     {% endfor %}<br>
