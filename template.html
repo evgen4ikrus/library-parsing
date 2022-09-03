@@ -17,12 +17,12 @@
           <li class="page-item {% if page_num == 1 %} disabled {% endif %}">
             <a class="page-link" href="index{{ page_num - 1 }}.html">Назад</a>
           </li>
-          {% for number in range(1, number_pages + 1) %}
+          {% for number in range(1, pages_number + 1) %}
             <li class="page-item {% if number == page_num %} active {% endif %}">
               <a class="page-link" href="index{{ number }}.html">{{ number }}</a>
             </li>
           {% endfor %}
-          <li class="page-item {% if page_num == number_pages %} disabled {% endif %}">
+          <li class="page-item {% if page_num == pages_number %} disabled {% endif %}">
             <a class="page-link" href="index{{ page_num + 1 }}.html">Вперед</a>
           </li>
         </ul>
@@ -41,7 +41,7 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <h5 class="card-title">{{ book.title }}</h5>
-                    <h6 class="card-title mb-3">{{ book.author }}</h6>
+                    <h6 class="card-title mb-1">{{ book.author }}</h6>
                     {% for genrу in book.genres %}
                       <span class="badge badge-light">{{ genrу }}</span>
                     {% endfor %}<br>

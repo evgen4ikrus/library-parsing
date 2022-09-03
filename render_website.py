@@ -24,13 +24,13 @@ def rebuild():
     books_on_pages  = list(chunked(books, books_per_page))
 
     for page_num, books_on_page in enumerate(books_on_pages, start=1):
-        number_pages = len(books_on_pages)
+        pages_number = len(books_on_pages)
         file_name = f'index{page_num}.html'
         file_path = os.path.join(folder_path, file_name)
         
         rendered_page = template.render(
             books_on_page=books_on_page,
-            number_pages=number_pages,
+            pages_number=pages_number,
             page_num=page_num,
         )
 
