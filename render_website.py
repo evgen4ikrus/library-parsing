@@ -16,8 +16,8 @@ def rebuild():
     template = env.get_template('template.html')
     books_per_page = 10
     
-    with open("media/book_catalog.json", "r", encoding='utf8') as my_file:
-        books = json.load(my_file)
+    with open("media/book_catalog.json", "r", encoding='utf8') as file:
+        books = json.load(file)
 
     folder_path = 'pages'
     os.makedirs(folder_path, exist_ok=True)
